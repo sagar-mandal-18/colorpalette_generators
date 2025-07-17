@@ -36,4 +36,4 @@ vintage flowers
 4.Click "Generate Palette"
 
 
-You’ll see live AI-generated color boxes if your internet is on and the key is correct.
+You'll see live AI-generated color boxes if your internet is on and the key is correct.
