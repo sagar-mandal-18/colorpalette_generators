@@ -1,2 +1,199 @@
 # colorpalette_generators
 Author--Sagar Mandal
+<!-- Color Palette Generator -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Combined AI Color Palette Generator</title>
+
+  <!-- Basic styling for layout and visuals -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f0f0f0;
+      padding: 50px;
+    }
+
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 10px;
+      width: 300px;
+    }
+
+    #palette {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    .color-box {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      border: 2px solid #ccc;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    #status {
+      margin-top: 20px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- App heading -->
+  <h1> AI Color Palette Generator (Online + Offline)</h1>
+  <h2>[ Select these Themes ]<br><br>sunset, 
+    forest  ,
+    ocean  ,
+    desert  ,
+    neon  ,
+    pastel , 
+    galaxy  ,
+    autumn  ,
+    ice  ,
+    lavender, 
+    retro,
+    sunrise,  
+    cyberpunk,  <br>
+    grayscale , 
+    rainy  ,
+    blossom , 
+    coral  ,
+    halloween,  
+    vintage  ,
+    aurora  ,
+    earth  ,
+    rose,
+    
+
+  </h2>
+
+  <!-- Input field for user to enter theme -->
+  <input type="text" id="theme" placeholder="Enter a theme (e.g., galaxy, sunset)" />
+  <br>
+
+  <!-- Button to trigger palette generation -->
+  <button onclick="generatePalette()">Generate Palette</button>
+
+  <!-- Container to hold generated color boxes -->
+  <div id="palette"></div>
+
+  <!-- Area to display status messages -->
+  <div id="status"></div>
+
+  <script>
+    //  Insert your OpenAI API key below (optional)
+    const openAIKey = ""; // Leave blank to use offline mode only
+
+    //  Offline fallback palettes (used if API not working or not available)
+    
+  const predefinedPalettes = {
+  "sunset": ["#FF6E7F", "#FFB88C", "#FFD194", "#FF9A8B", "#FFC3A0"],
+  "forest": ["#2E4600", "#486B00", "#A2C523", "#7D4427", "#1B512D"],
+  "ocean": ["#00BFFF", "#1E90FF", "#4682B4", "#5F9EA0", "#87CEFA"],
+  "desert": ["#C19A6B", "#EDC9AF", "#FFD700", "#DAA520", "#E97451"],
+  "neon": ["#39FF14", "#FF073A", "#00FFFF", "#FE019A", "#F5FF00"],
+  "pastel": ["#FADADD", "#BFD8D2", "#FFDAC1", "#E2F0CB", "#CBAACB"],
+  "galaxy": ["#0F0C29", "#302B63", "#24243E", "#6C3483", "#1B1464"],
+  "autumn": ["#D35400", "#E67E22", "#F39C12", "#7D6608", "#A04000"],
+  "ice": ["#DFF6FF", "#B8E4F0", "#A1CCD1", "#77B6EA", "#C9F4F9"],
+  "lavender": ["#E6E6FA", "#D8BFD8", "#DDA0DD", "#EE82EE", "#BA55D3"],
+
+  
+  "retro": ["#FF007F", "#00FFFF", "#8E2DE2", "#3DFFCE", "#2C003E"],
+  "sunrise": ["#FFD1A4", "#FFAB76", "#FF7E67", "#CDB4DB", "#4C3A3A"],
+  "cyberpunk": ["#FF2A6D", "#00FFF7", "#6F00FF", "#0C0F0A", "#9A00B8"],
+  "grayscale": ["#FFFFFF", "#CCCCCC", "#888888", "#444444", "#000000"],
+  "rainy": ["#A9A9A9", "#BCCAD6", "#5D737E", "#2E3A59", "#D3D3D3"],
+  "blossom": ["#FFDDEE", "#FFB7C5", "#FF8FA3", "#B0EACD", "#A3D8F4"],
+  "coral": ["#00EFFF", "#FF6F61", "#2EC4B6", "#003B46", "#FFECD1"],
+  "halloween": ["#FF7518", "#0B0C10", "#F8F8FF", "#6C3483", "#C70039"],
+  "vintage": ["#704214", "#FFF1C1", "#A89F91", "#4A3C31", "#8E8E8E"],
+  "aurora": ["#00FFAB", "#72F3FF", "#7A00CC", "#30E3CA", "#0A043C"],
+  "earth": ["#5A381E", "#8B6F47", "#A99E8B", "#BFA6A0", "#3C2F2F"],
+  "rose": ["#FFF0F5", "#FFC0CB", "#FF69B4", "#C71585", "#8B008B"]
+  };
+
+
+    // Main function: Called when user clicks "Generate Palette"
+    async function generatePalette() {
+      const theme = document.getElementById('theme').value.toLowerCase().trim();
+      const paletteDiv = document.getElementById('palette');
+      const statusDiv = document.getElementById('status');
+
+      paletteDiv.innerHTML = ""; // Clear previous palette
+      statusDiv.textContent = "Generating..."; // Show loading status
+
+      //  If OpenAI API key is provided, attempt online generation
+      if (openAIKey) {
+        try {
+          //  Sending request to OpenAI to get hex color codes
+          const response = await fetch("https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${openAIKey}`
+            },
+            body: JSON.stringify({
+              model: "gpt-4",
+              messages: [
+                { role: "system", content: "You are a helpful assistant that generates color palettes." },
+                { role: "user", content: `Generate a list of 5 hex color codes for the theme: "${theme}". Just return the hex codes.` }
+              ],
+              temperature: 0.7
+            })
+          });
+
+          const data = await response.json(); // Parse JSON response
+          const result = data.choices[0].message.content;
+
+          //  Extract hex color codes using regex
+          const hexCodes = result.match(/#[0-9A-Fa-f]{6}/g);
+
+          //  If valid hex codes are received, render them
+          if (hexCodes && hexCodes.length > 0) {
+            statusDiv.textContent = "AI-generated palette:";
+            renderColors(hexCodes); // Call function to display colors
+            return;
+          } else {
+            throw new Error("No hex codes returned from AI.");
+          }
+        } catch (err) {
+          console.warn("AI generation failed, falling back to offline. Error:", err);
+        }
+      }
+
+      //  If API fails or no key provided, use offline palette
+      if (predefinedPalettes[theme]) {
+        statusDiv.textContent = "Offline palette (no API):";
+        renderColors(predefinedPalettes[theme]);
+      } else {
+        //  Show message if theme not found
+        statusDiv.textContent = "Theme not found offline. Try: " + Object.keys(predefinedPalettes).join(", ");
+      }
+    }
+
+    //  Function to visually display color boxes in the palette
+    function renderColors(colors) {
+      const paletteDiv = document.getElementById('palette');
+      paletteDiv.innerHTML = ""; // Clear previous boxes
+
+      colors.forEach(color => {
+        const box = document.createElement('div');
+        box.className = "color-box";
+        box.style.backgroundColor = color;
+        box.title = color; // Tooltip with hex code
+        paletteDiv.appendChild(box);
+      });
+    }
+  </script>
+</body>
+</html>
