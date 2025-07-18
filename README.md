@@ -1,6 +1,4 @@
-// color palette generator
-
-Author -- Sagar Mandal
+Color Palette Generator
 
 An AI-based color palette generator is a tool that uses artificial intelligence (usually machine learning or deep learning techniques) to automatically generate visually appealing and contextually appropriate color combinations (palettes). These tools help designers, developers, and artists by creating harmonious colors based on:
 
